@@ -1,6 +1,8 @@
 #ifndef TIC_TAC_TOE_H
 #define TIC_TAC_TOE_H
 
+#include <iostream>
+
 #define ROWS 3
 #define COLS 3
 
@@ -18,6 +20,9 @@ class Board {
    public:
     Board();
     ~Board();
+
+    Board& Reset();
+    Board& Print();
 };
 
 Board::Board() {
@@ -25,16 +30,45 @@ Board::Board() {
     for (short int i = 0; i < ROWS; ++i) {
         matrix[i] = new char[COLS];
     }
-    nbr_moves = 0;
-    p1.symbol = ' ';
-    p2.symbol = ' ';
+    Reset();
 }
-
 Board::~Board() {
     for (short int i = 0; i < ROWS; ++i) {
         delete[] matrix[i];
     }
     delete[] matrix;
+}
+
+Board& Board::Reset() {
+    char c = '0';
+    for (short int i = 0; i < ROWS; ++i) {
+        for (short int j = 0; j < COLS; ++j) {
+            matrix[i][j] = ++c;
+        }
+    }
+    nbr_moves = 0;
+    p1.symbol = ' ';
+    p2.symbol = ' ';
+
+    return *this;
+}
+
+Board& Board::Print() {
+    for (short int i = 0; i < ROWS; ++i) {
+        std::cout << "     |     |     " << std::endl;
+        for (short int j = 0; j < COLS; ++j) {
+            std::cout << "  " << matrix[i][j] << "  ";
+            if (j < COLS - 1) {
+                std::cout << "|";
+            }
+        }
+        if (i < ROWS - 1) {
+            std::cout << "\n_____|_____|_____" << std::endl;
+        }
+    }
+    std::cout << "\n     |     |     " << std::endl;
+
+    return *this;
 }
 
 #endif
