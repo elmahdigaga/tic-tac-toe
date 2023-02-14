@@ -16,6 +16,7 @@ class Board {
     int nbr_moves;
     Player p1;
     Player p2;
+    Player* p;
 
    public:
     Board();
@@ -23,6 +24,7 @@ class Board {
 
     Board& Reset();
     Board& Print();
+    Board& SetPlayers();
 };
 
 Board::Board() {
@@ -32,6 +34,7 @@ Board::Board() {
     }
     Reset();
 }
+
 Board::~Board() {
     for (short int i = 0; i < ROWS; ++i) {
         delete[] matrix[i];
@@ -49,6 +52,7 @@ Board& Board::Reset() {
     nbr_moves = 0;
     p1.symbol = ' ';
     p2.symbol = ' ';
+    p = nullptr;
 
     return *this;
 }
@@ -67,6 +71,23 @@ Board& Board::Print() {
         }
     }
     std::cout << "\n     |     |     " << std::endl;
+
+    return *this;
+}
+
+Board& Board::SetPlayers() {
+    srand(time(0));
+    short int who_first = rand() % 2 + 1;
+    if (who_first == 1) {
+        p1.symbol = 'X';
+        p2.symbol = 'O';
+        p = &p1;
+    } else {
+        p1.symbol = 'O';
+        p2.symbol = 'X';
+        p = &p2;
+    }
+    std::cout << "Player" << who_first << " (X) plays first" << std::endl;
 
     return *this;
 }
