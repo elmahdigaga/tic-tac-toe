@@ -20,11 +20,22 @@ class Board {
 
    public:
     Board();
+
     ~Board();
 
     Board& Reset();
+
     Board& Print();
+
     Board& SetPlayers();
+
+    int SlotToRow(int slot);
+
+    int SlotToCol(int slot);
+
+    bool isValid(int slot);
+
+    Board& Play();
 };
 
 Board::Board() {
@@ -88,6 +99,38 @@ Board& Board::SetPlayers() {
         p = &p2;
     }
     std::cout << "Player" << who_first << " (X) plays first" << std::endl;
+
+    return *this;
+}
+
+int Board::SlotToRow(int slot) {
+    return (slot - 1) / ROWS;
+}
+int Board::SlotToCol(int slot) {
+    return (slot - 1) % COLS;
+}
+
+bool Board::isValid(int slot) {
+    if (slot < 1 || slot > 9) {
+        return false;
+    }
+
+    int row = SlotToRow(slot);
+    int col = SlotToCol(slot);
+    if (matrix[row][col] == 'X' || matrix[row][col] == 'O') {
+        return false;
+    }
+
+    matrix[row][col] = p->symbol;
+    return true;
+}
+
+Board& Board::Play() {
+    int slot = 0;
+    do {
+        std::cout << "Choose an empty slot:\n> " << std::endl;
+        std::cin >> slot;
+    } while (!isValid(slot));
 
     return *this;
 }
