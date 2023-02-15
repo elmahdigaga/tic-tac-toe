@@ -19,6 +19,12 @@ class Board {
     Player player2;
     Player* current_player;
 
+    int SlotToRow(int slot);
+
+    int SlotToCol(int slot);
+
+    bool isValid(int slot);
+
    public:
     Board();
 
@@ -29,12 +35,6 @@ class Board {
     Board& Print();
 
     Board& SetPlayers();
-
-    int SlotToRow(int slot);
-
-    int SlotToCol(int slot);
-
-    bool isValid(int slot);
 
     Board& Play();
 
