@@ -13,7 +13,7 @@ typedef struct {
 class Board {
    private:
     char** matrix;
-    int nbr_moves;
+    int number_moves;
     Player p1;
     Player p2;
     Player* p;
@@ -36,6 +36,8 @@ class Board {
     bool isValid(int slot);
 
     Board& Play();
+
+    Board& SwitchPlayer();
 };
 
 Board::Board() {
@@ -60,7 +62,7 @@ Board& Board::Reset() {
             matrix[i][j] = ++c;
         }
     }
-    nbr_moves = 0;
+    number_moves = 0;
     p1.symbol = ' ';
     p2.symbol = ' ';
     p = nullptr;
@@ -132,6 +134,15 @@ Board& Board::Play() {
         std::cin >> slot;
     } while (!isValid(slot));
 
+    return *this;
+}
+
+Board& Board::SwitchPlayer() {
+    if (p == &p1) {
+        p = &p2;
+    } else {
+        p = &p1;
+    }
     return *this;
 }
 
