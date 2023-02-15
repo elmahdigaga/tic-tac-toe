@@ -7,6 +7,7 @@
 #define COLS 3
 
 typedef struct {
+    char name[8] = "Player ";
     char symbol;
 } Player;
 
@@ -40,6 +41,8 @@ class Board {
     Board& SwitchPlayer();
 
     bool isWin();
+
+    Board& AnnounceWin();
 };
 
 Board::Board() {
@@ -65,7 +68,9 @@ Board& Board::Reset() {
         }
     }
     number_moves = 0;
+    player1.name[6] = '1';
     player1.symbol = ' ';
+    player2.name[6] = '2';
     player2.symbol = ' ';
     current_player = nullptr;
 
@@ -102,7 +107,6 @@ Board& Board::SetPlayers() {
         player2.symbol = 'X';
         current_player = &player2;
     }
-    std::cout << "Player" << who_first << " (X) plays first" << std::endl;
 
     return *this;
 }
@@ -132,9 +136,10 @@ bool Board::isValid(int slot) {
 Board& Board::Play() {
     int slot = 0;
     do {
-        std::cout << "Choose an empty slot:\n> " << std::endl;
+        std::cout << current_player->name << " chooses an empty slot:\n> ";
         std::cin >> slot;
     } while (!isValid(slot));
+    ++number_moves;
 
     return *this;
 }
@@ -149,7 +154,9 @@ Board& Board::SwitchPlayer() {
 }
 
 bool Board::isWin() {
-    if (number_moves < 5) {
+    if (number_moves == 9) {
+        return true;
+    } else if (number_moves < 5) {
         return false;
     }
     int count_vert = 0, count_hori = 0, count_diag = 0, count_inv_diag = 0;
@@ -182,6 +189,16 @@ bool Board::isWin() {
     }
 
     return false;
+}
+
+Board& Board::AnnounceWin() {
+    if (number_moves == 9) {
+        std::cout << "Draw!" << std::endl;
+        return *this;
+    }
+    std::cout << current_player->name << " Won!" << std::endl;
+
+    return *this;
 }
 
 #endif
