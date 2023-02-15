@@ -9,6 +9,7 @@
 typedef struct {
     char name[8] = "Player ";
     char symbol;
+    int score;
 } Player;
 
 class Board {
@@ -43,6 +44,8 @@ class Board {
     bool isWin();
 
     Board& AnnounceWin();
+
+    void PrintScore();
 };
 
 Board::Board() {
@@ -50,6 +53,8 @@ Board::Board() {
     for (short int i = 0; i < ROWS; ++i) {
         grid[i] = new char[COLS];
     }
+    player1.score = 0;
+    player2.score = 0;
     Reset();
 }
 
@@ -197,8 +202,14 @@ Board& Board::AnnounceWin() {
         return *this;
     }
     std::cout << current_player->name << " Won!" << std::endl;
+    ++(current_player->score);
 
     return *this;
+}
+
+void Board::PrintScore() {
+    std::cout << player1.name << ": " << player1.score << std::endl;
+    std::cout << player2.name << ": " << player2.score << std::endl;
 }
 
 #endif

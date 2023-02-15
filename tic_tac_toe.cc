@@ -21,6 +21,7 @@ int main() {
             board.SwitchPlayer();
         }
 
+        board.PrintScore();
         std::cout << "Press \"0\" to restart:\n> ";
         std::cin >> option;
     } while (!option);
