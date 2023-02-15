@@ -3,44 +3,51 @@
 
 #include <iostream>
 
+#if _WIN32
+#define CLEAR_SCREEN "cls"
+#else
+#define CLEAR_SCREEN "clear"
+#endif
+
 #define ROWS 3
 #define COLS 3
+#define BOARD_SIZE 9
 
-typedef struct {
+struct Player {
     char name[8] = "Player ";
     char symbol;
     int score;
-} Player;
+};
 
 class Board {
    private:
     char** grid;
-    int number_moves;
+    __int8 number_moves;
     Player player1;
     Player player2;
     Player* current_player;
 
-    int SlotToRow(int slot);
-    int SlotToCol(int slot);
-    bool isValid(int row, int col);
-    bool isSlotValid(int slot);
+    __int8 SlotToRow(const __int8 slot);
+    __int8 SlotToCol(const __int8 slot);
+    bool isValid(const __int8 row, const __int8 col) const;
+    bool isSlotValid(const __int8 slot) const;
 
    public:
     Board();
     ~Board();
-    Board& Reset();
-    Board& Print();
-    Board& SetPlayers();
-    Board& Play();
-    Board& SwitchPlayer();
-    bool isWin();
-    Board& AnnounceWin();
-    Board& PrintScore();
+    void Reset();
+    void Print() const;
+    void SetPlayers();
+    void Play();
+    void SwitchPlayer();
+    bool isWin() const;
+    void AnnounceWin();
+    void PrintScore() const;
 };
 
 Board::Board() {
     grid = new char*[ROWS];
-    for (short int i = 0; i < ROWS; ++i) {
+    for (__int8 i = 0; i < ROWS; ++i) {
         grid[i] = new char[COLS];
     }
     player1.score = 0;
@@ -49,13 +56,13 @@ Board::Board() {
 }
 
 Board::~Board() {
-    for (short int i = 0; i < ROWS; ++i) {
+    for (__int8 i = 0; i < ROWS; ++i) {
         delete[] grid[i];
     }
     delete[] grid;
 }
 
-Board& Board::Reset() {
+void Board::Reset() {
     char c = '0';
     for (short int i = 0; i < ROWS; ++i) {
         for (short int j = 0; j < COLS; ++j) {
@@ -68,31 +75,26 @@ Board& Board::Reset() {
     player2.name[6] = '2';
     player2.symbol = ' ';
     current_player = nullptr;
-
-    return *this;
 }
 
-Board& Board::Print() {
-    for (short int i = 0; i < ROWS; ++i) {
-        std::cout << "     |     |     " << std::endl;
-        for (short int j = 0; j < COLS; ++j) {
+void Board::Print() const {
+    for (__int8 i = 0; i < ROWS; ++i) {
+        std::cout << "     |     |     \n";
+        for (__int8 j = 0; j < COLS; ++j) {
             std::cout << "  " << grid[i][j] << "  ";
             if (j < COLS - 1) {
                 std::cout << "|";
             }
         }
         if (i < ROWS - 1) {
-            std::cout << "\n_____|_____|_____" << std::endl;
+            std::cout << "\n_____|_____|_____\n";
         }
     }
-    std::cout << "\n     |     |     " << std::endl;
-
-    return *this;
+    std::cout << "\n     |     |     \n";
 }
 
-Board& Board::SetPlayers() {
-    srand(time(0));
-    short int who_first = rand() % 2 + 1;
+void Board::SetPlayers() {
+    __int8 who_first = rand() % 2 + 1;
     if (who_first == 1) {
         player1.symbol = 'X';
         player2.symbol = 'O';
@@ -102,61 +104,59 @@ Board& Board::SetPlayers() {
         player2.symbol = 'X';
         current_player = &player2;
     }
-
-    return *this;
 }
 
-int Board::SlotToRow(int slot) {
+__int8 Board::SlotToRow(const __int8 slot) {
     return (slot - 1) / ROWS;
 }
-int Board::SlotToCol(int slot) {
+__int8 Board::SlotToCol(const __int8 slot) {
     return (slot - 1) % COLS;
 }
 
-bool Board::isValid(int row, int col) {
-    return (grid[row][col] == 'X' || grid[row][col] == 'O') ? false : true;
+bool Board::isValid(const __int8 row, const __int8 col) const {
+    return grid[row][col] != 'X' && grid[row][col] != 'O';
 }
 
-bool Board::isSlotValid(int slot) {
-    return (slot < 1 || slot > 9) ? false : true;
+bool Board::isSlotValid(const __int8 slot) const {
+    return slot >= 1 && slot <= 9;
 }
 
-Board& Board::Play() {
-    int slot = 0, row = 0, col = 0;
+void Board::Play() {
+    __int8 slot = 0, row = 0, col = 0;
     do {
         std::cout << current_player->name << " chooses an empty slot:\n> ";
-        std::cin >> slot;
-        if (!isSlotValid(slot))
+        scanf("%hhd", &slot);
+        if (!isSlotValid(slot)) {
+            std::cout << "Here\n";
             continue;
-        row = SlotToRow(slot);
-        col = SlotToCol(slot);
+        }
+        row = (slot - 1) / ROWS;
+        col = (slot - 1) % COLS;
     } while (!isValid(row, col));
 
     grid[row][col] = current_player->symbol;
     ++number_moves;
-
-    return *this;
 }
 
-Board& Board::SwitchPlayer() {
+void Board::SwitchPlayer() {
     if (current_player == &player1) {
         current_player = &player2;
     } else {
         current_player = &player1;
     }
-    return *this;
 }
 
-bool Board::isWin() {
-    if (number_moves == 9) {
+bool Board::isWin() const {
+    if (number_moves == BOARD_SIZE) {
         return true;
     } else if (number_moves < 5) {
         return false;
     }
-    int count_vert = 0, count_hori = 0, count_diag = 0, count_inv_diag = 0;
-    for (int i = 0; i < ROWS; ++i) {
+
+    __int8 count_vert = 0, count_hori = 0, count_diag = 0, count_inv_diag = 0;
+    for (__int8 i = 0; i < ROWS; ++i) {
         count_vert = 0, count_hori = 0;
-        for (int j = 0; j < COLS - 1; ++j) {
+        for (__int8 j = 0; j < COLS - 1; ++j) {
             if (grid[i][j] == grid[i][j + 1]) {
                 if (++count_vert == ROWS - 1) {
                     return true;
@@ -174,7 +174,7 @@ bool Board::isWin() {
                     return true;
                 }
             }
-            if (grid[i][ROWS - i - 1] == grid[i + 1][ROWS - i - 1 - 1]) {
+            if (grid[i][ROWS - i - 1] == grid[i + 1][ROWS - i - 2]) {
                 if (++count_inv_diag == ROWS - 1) {
                     return true;
                 }
@@ -185,22 +185,18 @@ bool Board::isWin() {
     return false;
 }
 
-Board& Board::AnnounceWin() {
-    if (number_moves == 9) {
-        std::cout << "Draw!" << std::endl;
-        return *this;
+void Board::AnnounceWin() {
+    if (number_moves == BOARD_SIZE) {
+        std::cout << "Draw!\n";
+        return;
     }
-    std::cout << current_player->name << " Won!" << std::endl;
+    std::cout << current_player->name << " Won!\n";
     ++(current_player->score);
-
-    return *this;
 }
 
-Board& Board::PrintScore() {
-    std::cout << player1.name << ": " << player1.score << std::endl;
-    std::cout << player2.name << ": " << player2.score << std::endl;
-
-    return *this;
+void Board::PrintScore() const {
+    std::cout << player1.name << ": " << player1.score << "\t";
+    std::cout << player2.name << ": " << player2.score << "\n";
 }
 
 #endif
