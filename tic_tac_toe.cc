@@ -8,26 +8,27 @@ int main() {
     __int8 option = 0;
 
     do {
-        board.Reset();
-        board.SetPlayers();
+        board.Reset();       // Reset the board and it's settings
+        board.SetPlayers();  // Set the players symbols and order of play
 
         for (__int8 i = 0; i < BOARD_SIZE; ++i) {
-            system(CLEAR_SCREEN);
-            board.Print();
-            board.Play();
+            system(CLEAR_SCREEN);  // Clear the screen
+            board.Print();         // Show the board
+            board.Play();          // Take input
 
-            if (board.isWin()) {
-                system(CLEAR_SCREEN);
-                board.Print();
-                board.AnnounceWin();
+            if (board.isWin()) {  // Check for a win
                 break;
             }
 
-            board.SwitchPlayer();
+            board.SwitchPlayer();  // Swap players turn
         }
 
-        board.PrintScore();
-        std::cout << "Press \"0\" to restart:\n> ";
+        system(CLEAR_SCREEN);    // Clear the screen
+        board.Print();           // Show the board
+        board.AnnounceResult();  // Announce the winner or a draw
+        board.PrintScore();      // Show the current score
+
+        std::cout << "Press \"0\" to restart:\n> ";  // 0 to start another round
         scanf("%hhd", &option);
     } while (!option);
 
