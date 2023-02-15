@@ -12,11 +12,11 @@ typedef struct {
 
 class Board {
    private:
-    char** matrix;
+    char** grid;
     int number_moves;
-    Player p1;
-    Player p2;
-    Player* p;
+    Player player1;
+    Player player2;
+    Player* current_player;
 
    public:
     Board();
@@ -38,34 +38,36 @@ class Board {
     Board& Play();
 
     Board& SwitchPlayer();
+
+    bool isWin();
 };
 
 Board::Board() {
-    matrix = new char*[ROWS];
+    grid = new char*[ROWS];
     for (short int i = 0; i < ROWS; ++i) {
-        matrix[i] = new char[COLS];
+        grid[i] = new char[COLS];
     }
     Reset();
 }
 
 Board::~Board() {
     for (short int i = 0; i < ROWS; ++i) {
-        delete[] matrix[i];
+        delete[] grid[i];
     }
-    delete[] matrix;
+    delete[] grid;
 }
 
 Board& Board::Reset() {
     char c = '0';
     for (short int i = 0; i < ROWS; ++i) {
         for (short int j = 0; j < COLS; ++j) {
-            matrix[i][j] = ++c;
+            grid[i][j] = ++c;
         }
     }
     number_moves = 0;
-    p1.symbol = ' ';
-    p2.symbol = ' ';
-    p = nullptr;
+    player1.symbol = ' ';
+    player2.symbol = ' ';
+    current_player = nullptr;
 
     return *this;
 }
@@ -74,7 +76,7 @@ Board& Board::Print() {
     for (short int i = 0; i < ROWS; ++i) {
         std::cout << "     |     |     " << std::endl;
         for (short int j = 0; j < COLS; ++j) {
-            std::cout << "  " << matrix[i][j] << "  ";
+            std::cout << "  " << grid[i][j] << "  ";
             if (j < COLS - 1) {
                 std::cout << "|";
             }
@@ -92,13 +94,13 @@ Board& Board::SetPlayers() {
     srand(time(0));
     short int who_first = rand() % 2 + 1;
     if (who_first == 1) {
-        p1.symbol = 'X';
-        p2.symbol = 'O';
-        p = &p1;
+        player1.symbol = 'X';
+        player2.symbol = 'O';
+        current_player = &player1;
     } else {
-        p1.symbol = 'O';
-        p2.symbol = 'X';
-        p = &p2;
+        player1.symbol = 'O';
+        player2.symbol = 'X';
+        current_player = &player2;
     }
     std::cout << "Player" << who_first << " (X) plays first" << std::endl;
 
@@ -119,11 +121,11 @@ bool Board::isValid(int slot) {
 
     int row = SlotToRow(slot);
     int col = SlotToCol(slot);
-    if (matrix[row][col] == 'X' || matrix[row][col] == 'O') {
+    if (grid[row][col] == 'X' || grid[row][col] == 'O') {
         return false;
     }
 
-    matrix[row][col] = p->symbol;
+    grid[row][col] = current_player->symbol;
     return true;
 }
 
@@ -138,12 +140,48 @@ Board& Board::Play() {
 }
 
 Board& Board::SwitchPlayer() {
-    if (p == &p1) {
-        p = &p2;
+    if (current_player == &player1) {
+        current_player = &player2;
     } else {
-        p = &p1;
+        current_player = &player1;
     }
     return *this;
+}
+
+bool Board::isWin() {
+    if (number_moves < 5) {
+        return false;
+    }
+    int count_vert = 0, count_hori = 0, count_diag = 0, count_inv_diag = 0;
+    for (int i = 0; i < ROWS; ++i) {
+        count_vert = 0, count_hori = 0;
+        for (int j = 0; j < COLS - 1; ++j) {
+            if (grid[i][j] == grid[i][j + 1]) {
+                if (++count_vert == ROWS - 1) {
+                    return true;
+                }
+            }
+            if (grid[j][i] == grid[j + 1][i]) {
+                if (++count_hori == ROWS - 1) {
+                    return true;
+                }
+            }
+        }
+        if (i < ROWS - 1) {
+            if (grid[i][i] == grid[i + 1][i + 1]) {
+                if (++count_diag == ROWS - 1) {
+                    return true;
+                }
+            }
+            if (grid[i][ROWS - i - 1] == grid[i + 1][ROWS - i - 1 - 1]) {
+                if (++count_inv_diag == ROWS - 1) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
 }
 
 #endif
