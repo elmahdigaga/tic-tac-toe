@@ -13,36 +13,37 @@
 #define COLS 3
 #define BOARD_SIZE 9
 
+// Player strcuture
 struct Player {
-    char name[8] = "Player ";
-    char symbol;
+    char name[8] = "Player ";  // Player1 or Player2
+    char symbol;               // X or O
     int score;
 };
 
 class Board {
    private:
-    char** grid;
-    __int8 number_moves;
+    char** grid;          // Board matrix
+    __int8 number_moves;  // total number of moves
     Player player1;
     Player player2;
-    Player* current_player;
+    Player* current_player;  // Pointer to the current player
 
-    __int8 SlotToRow(const __int8 slot);
-    __int8 SlotToCol(const __int8 slot);
-    bool isValid(const __int8 row, const __int8 col) const;
-    bool isSlotValid(const __int8 slot) const;
+    __int8 SlotToRow(const __int8 slot);                     // Translates the slot number to the corresponding row index
+    __int8 SlotToCol(const __int8 slot);                     // Translates the slot number to the corresponding column index
+    bool isValid(const __int8 row, const __int8 col) const;  // Checks if the slot is empty
+    bool isSlotValid(const __int8 slot) const;               // Validates the slot number
 
    public:
-    Board();
-    ~Board();
-    void Reset();
-    void Print() const;
-    void SetPlayers();
-    void Play();
-    void SwitchPlayer();
-    bool isWin() const;
-    void AnnounceWin();
-    void PrintScore() const;
+    Board();                  // Constructor
+    ~Board();                 // Destructor
+    void Reset();             // Reset the board
+    void Print() const;       // Print/Display the board
+    void SetPlayers();        // Assign symbols and order of play
+    void Play();              // Take input and update the board
+    void SwitchPlayer();      // Change the current player
+    bool isWin() const;       // Check for a win or draw
+    void AnnounceWin();       // Print the result (Win or Draw)
+    void PrintScore() const;  // Print the cumulative player scores
 };
 
 Board::Board() {
@@ -130,8 +131,8 @@ void Board::Play() {
             std::cout << "Here\n";
             continue;
         }
-        row = (slot - 1) / ROWS;
-        col = (slot - 1) % COLS;
+        row = SlotToRow(slot);
+        col = SlotToCol(slot);
     } while (!isValid(row, col));
 
     grid[row][col] = current_player->symbol;
