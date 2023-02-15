@@ -21,31 +21,21 @@ class Board {
     Player* current_player;
 
     int SlotToRow(int slot);
-
     int SlotToCol(int slot);
-
-    bool isValid(int slot);
+    bool isValid(int row, int col);
+    bool isSlotValid(int slot);
 
    public:
     Board();
-
     ~Board();
-
     Board& Reset();
-
     Board& Print();
-
     Board& SetPlayers();
-
     Board& Play();
-
     Board& SwitchPlayer();
-
     bool isWin();
-
     Board& AnnounceWin();
-
-    void PrintScore();
+    Board& PrintScore();
 };
 
 Board::Board() {
@@ -123,27 +113,26 @@ int Board::SlotToCol(int slot) {
     return (slot - 1) % COLS;
 }
 
-bool Board::isValid(int slot) {
-    if (slot < 1 || slot > 9) {
-        return false;
-    }
+bool Board::isValid(int row, int col) {
+    return (grid[row][col] == 'X' || grid[row][col] == 'O') ? false : true;
+}
 
-    int row = SlotToRow(slot);
-    int col = SlotToCol(slot);
-    if (grid[row][col] == 'X' || grid[row][col] == 'O') {
-        return false;
-    }
-
-    grid[row][col] = current_player->symbol;
-    return true;
+bool Board::isSlotValid(int slot) {
+    return (slot < 1 || slot > 9) ? false : true;
 }
 
 Board& Board::Play() {
-    int slot = 0;
+    int slot = 0, row = 0, col = 0;
     do {
         std::cout << current_player->name << " chooses an empty slot:\n> ";
         std::cin >> slot;
-    } while (!isValid(slot));
+        if (!isSlotValid(slot))
+            continue;
+        row = SlotToRow(slot);
+        col = SlotToCol(slot);
+    } while (!isValid(row, col));
+
+    grid[row][col] = current_player->symbol;
     ++number_moves;
 
     return *this;
@@ -207,9 +196,11 @@ Board& Board::AnnounceWin() {
     return *this;
 }
 
-void Board::PrintScore() {
+Board& Board::PrintScore() {
     std::cout << player1.name << ": " << player1.score << std::endl;
     std::cout << player2.name << ": " << player2.score << std::endl;
+
+    return *this;
 }
 
 #endif
