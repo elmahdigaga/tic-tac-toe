@@ -16,7 +16,6 @@ int main() {
             board.Print();         // Show the board
             board.Play();          // Take input
 
-
             if (board.isWin()) {  // Check for a win
                 break;
             }
